@@ -19,7 +19,7 @@ gem "rswag-ui", "2.17.0"
 gem "solid_cable", "3.0"
 gem "solid_cache", "1.0"
 gem "solid_queue", "1.2"
-gem "sqlite3", "2.1.1"
+gem "sqlite3", "2.8.1"
 gem "thruster", "0.1.16", require: false
 gem "tzinfo-data", "1.2024.2", platforms: %i[windows jruby]
 
