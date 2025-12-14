@@ -17,7 +17,7 @@ gem "rails", "8.1.1"
 gem "rswag-api", "2.17.0"
 gem "rswag-ui", "2.17.0"
 gem "solid_cable", "3.0"
-gem "solid_cache", "1.0"
+gem "solid_cache", "1.0.10"
 gem "solid_queue", "1.2"
 gem "sqlite3", "2.8.1"
 gem "thruster", "0.1.16", require: false
