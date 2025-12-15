@@ -54,3 +54,7 @@ detectors:
 
   LongParameterList:
     max_params: 4
+
+  InstanceVariableAssumption:
+    exclude:
+      - ApiKey  # @raw_token is set in before_validation callback
