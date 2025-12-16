@@ -9,6 +9,23 @@ module Api
         @current_api_key&.user
       end
 
+      # Render a successful response with consistent structure
+      def render_success(data, status: :ok)
+        render json: { success: true, data: }, status:
+      end
+
+      # Render an error response with consistent structure
+      def render_error(error_code, message: nil, details: nil)
+        render json: {
+          success: false,
+          error: {
+            code: error_code.code,
+            message: message || error_code.default_message,
+            details:
+          }.compact
+        }, status: error_code.status
+      end
+
       private
 
       def authenticate_api_key!
@@ -19,7 +36,8 @@ module Api
           @current_api_key = api_key
           @current_api_key.touch_last_used
         else
-          render_unauthorized
+          error_code = api_key&.expired? ? ErrorCodes::TOKEN_EXPIRED : ErrorCodes::UNAUTHORIZED
+          render_error(error_code)
         end
       end
 
@@ -28,10 +46,6 @@ module Api
         return nil if auth_header.blank?
 
         auth_header.gsub(/^Bearer\s+/, "")
-      end
-
-      def render_unauthorized
-        render json: { error: "Unauthorized" }, status: :unauthorized
       end
     end
   end

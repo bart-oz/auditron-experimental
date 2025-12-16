@@ -81,3 +81,8 @@ detectors:
       - ReconciliationJob#save_reconciliation_results
       - ReconciliationJob#build_result_attributes
       - ReconciliationJob#build_report
+      - Api::V1::BaseController#render_error
+
+  ControlParameter:
+    exclude:
+      - Api::V1::BaseController#render_error
