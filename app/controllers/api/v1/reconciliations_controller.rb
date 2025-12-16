@@ -4,6 +4,7 @@ module Api
   module V1
     class ReconciliationsController < BaseController
       include Pundit::Authorization
+      include Pagy::Method
 
       before_action :authenticate_api_key!
       before_action :set_reconciliation, only: [:show]
@@ -16,8 +17,12 @@ module Api
       # GET /api/v1/reconciliations
       def index
         authorize Reconciliation
-        reconciliations = policy_scope(Reconciliation).recent
-        render_success({ reconciliations: reconciliations.map { |r| ReconciliationSerializer.call(r) } })
+        @pagy, reconciliations = pagy(:offset, policy_scope(Reconciliation).recent)
+
+        render_success({
+                         reconciliations: reconciliations.map { |r| ReconciliationSerializer.call(r) },
+                         pagination: @pagy.data_hash
+                       })
       end
 
       # GET /api/v1/reconciliations/:id
