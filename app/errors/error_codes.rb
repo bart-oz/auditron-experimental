@@ -38,4 +38,11 @@ module ErrorCodes
     status: :unprocessable_content,
     default_message: "Validation failed"
   )
+
+  # Rate Limiting (429)
+  RATE_LIMITED = ErrorCode.new(
+    code: "RATE_LIMITED",
+    status: :too_many_requests,
+    default_message: "Too many requests. Please try again later."
+  )
 end

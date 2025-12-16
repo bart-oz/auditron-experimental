@@ -12,6 +12,7 @@ gem "kamal", "2.9.0", require: false
 gem "litestream", "0.14.0", require: false, platforms: :ruby
 gem "puma", "7.1.0"
 gem "pundit", "2.5.2"
+gem "rack-attack", "6.7.0"
 gem "rack-cors", "3.0.0"
 gem "rails", "8.1.1"
 gem "rswag-api", "2.17.0"

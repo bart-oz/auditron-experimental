@@ -23,5 +23,6 @@ RSpec.describe ErrorCodes do
     it { expect(ErrorCodes::FORBIDDEN.status).to eq(:forbidden) }
     it { expect(ErrorCodes::NOT_FOUND.status).to eq(:not_found) }
     it { expect(ErrorCodes::VALIDATION_ERROR.status).to eq(:unprocessable_content) }
+    it { expect(ErrorCodes::RATE_LIMITED.status).to eq(:too_many_requests) }
   end
 end

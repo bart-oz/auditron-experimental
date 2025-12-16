@@ -10,6 +10,10 @@ detectors:
   IrresponsibleModule:
     enabled: false
 
+  TooManyConstants:
+    exclude:
+      - ErrorCodes  # Error code constants are intentionally grouped here
+
   UncommunicativeVariableName:
     accept:
       - e
