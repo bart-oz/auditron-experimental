@@ -42,6 +42,29 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
 
         expect(json_data["reconciliations"].first["id"]).to eq(newer_reconciliation.id)
       end
+
+      it "includes pagination metadata" do
+        get "/api/v1/reconciliations", headers: auth_headers
+
+        expect(json_data["pagination"]).to include("count", "page", "limit", "last")
+        expect(json_data["pagination"]["count"]).to eq(2)
+        expect(json_data["pagination"]["page"]).to eq(1)
+      end
+
+      it "respects page parameter" do
+        get "/api/v1/reconciliations", params: { page: 2 }, headers: auth_headers
+
+        expect(json_data["reconciliations"]).to be_empty
+        expect(json_data["pagination"]["page"]).to eq(2)
+      end
+
+      it "respects limit parameter" do
+        get "/api/v1/reconciliations", params: { limit: 1 }, headers: auth_headers
+
+        expect(json_data["reconciliations"].length).to eq(1)
+        expect(json_data["pagination"]["limit"]).to eq(1)
+        expect(json_data["pagination"]["last"]).to eq(2)
+      end
     end
 
     context "without authentication" do

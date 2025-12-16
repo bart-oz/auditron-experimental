@@ -275,6 +275,9 @@ GEM
     nokogiri (1.18.10-x86_64-linux-musl)
       racc (~> 1.4)
     ostruct (0.6.3)
+    pagy (43.2.1)
+      json
+      yaml
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -462,6 +465,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    yaml (0.4.0)
     zeitwerk (2.7.3)
 
 PLATFORMS
@@ -489,6 +493,7 @@ DEPENDENCIES
   interactor (= 3.2)
   kamal (= 2.9.0)
   litestream (= 0.14.0)
+  pagy (= 43.2.1)
   puma (= 7.1.0)
   pundit (= 2.5.2)
   rack-attack (= 6.7.0)
