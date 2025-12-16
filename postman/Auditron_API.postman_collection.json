@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "auditron-api-collection",
+		"name": "Auditron API",
+		"description": "Payment Reconciliation API - Auditron\n\n## Setup\n1. Run `bin/rails db:seed` to create demo user\n2. Copy the API token from seed output\n3. Set the `api_token` variable in this collection\n\n## Authentication\nAll endpoints require Bearer token authentication.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{api_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "api_token",
+			"value": "YOUR_API_TOKEN_HERE",
+			"type": "string"
+		},
+		{
+			"key": "reconciliation_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/up",
+					"host": ["{{base_url}}"],
+					"path": ["up"]
+				},
+				"description": "Health check endpoint - no auth required"
+			},
+			"response": []
+		},
+		{
+			"name": "List Reconciliations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has success flag', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});",
+							"",
+							"pm.test('Response has pagination', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.pagination).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reconciliations?page=1&limit=25",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "reconciliations"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"description": "Page number (default: 1)"
+						},
+						{
+							"key": "limit",
+							"value": "25",
+							"description": "Items per page (default: 25, max: 100)"
+						}
+					]
+				},
+				"description": "List all reconciliations for the authenticated user with pagination."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Reconciliation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Response has success flag', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});",
+							"",
+							"pm.test('Reconciliation has pending status', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.reconciliation.status).to.eql('pending');",
+							"});",
+							"",
+							"// Save reconciliation ID for subsequent requests",
+							"var jsonData = pm.response.json();",
+							"if (jsonData.data && jsonData.data.reconciliation) {",
+							"    pm.collectionVariables.set('reconciliation_id', jsonData.data.reconciliation.id);",
+							"    console.log('Saved reconciliation_id:', jsonData.data.reconciliation.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "reconciliation[bank_file]",
+							"description": "Bank transactions CSV file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "reconciliation[processor_file]",
+							"description": "Payment processor JSON file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/reconciliations",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "reconciliations"]
+				},
+				"description": "Create a new reconciliation with bank and processor files.\n\n**Bank File (CSV):**\n```\ntransaction_id,date,amount,description,status,account_number\nTX001,01/04/2023,100.00,Payment One,completed,1234567890\n```\n\n**Processor File (JSON):**\n```json\n{\n  \"transactions\": [\n    {\"id\": \"TX001\", \"timestamp\": \"2023-04-01T09:15:32Z\", \"amount_cents\": 10000, \"merchant\": \"Payment One\", \"status\": \"successful\"}\n  ]\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Reconciliation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has success flag', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});",
+							"",
+							"pm.test('Response has reconciliation data', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.reconciliation).to.exist;",
+							"    pm.expect(jsonData.data.reconciliation.id).to.exist;",
+							"    pm.expect(jsonData.data.reconciliation.status).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reconciliations/{{reconciliation_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "reconciliations", "{{reconciliation_id}}"]
+				},
+				"description": "Get details of a specific reconciliation.\n\nAfter processing completes, the response includes:\n- `matched_count` - Transactions found in both files\n- `bank_only_count` - Transactions only in bank file\n- `processor_only_count` - Transactions only in processor file\n- `discrepancy_count` - Same ID but different amounts"
+			},
+			"response": []
+		},
+		{
+			"name": "Error: Unauthorized (No Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 401', function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test('Response has error code', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.false;",
+							"    pm.expect(jsonData.error.code).to.eql('UNAUTHORIZED');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reconciliations",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "reconciliations"]
+				},
+				"description": "Test unauthorized access - should return 401 with UNAUTHORIZED error code"
+			},
+			"response": []
+		},
+		{
+			"name": "Error: Not Found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 404', function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test('Response has error code', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.false;",
+							"    pm.expect(jsonData.error.code).to.eql('NOT_FOUND');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reconciliations/00000000-0000-0000-0000-000000000000",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "reconciliations", "00000000-0000-0000-0000-000000000000"]
+				},
+				"description": "Test not found error - should return 404 with NOT_FOUND error code"
+			},
+			"response": []
+		}
+	]
+}

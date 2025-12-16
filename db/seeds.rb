@@ -1,9 +1,32 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# frozen_string_literal: true
+
+# rubocop:disable Rails/Output
+
+# Seeds for development and demo purposes
+# Run: bin/rails db:seed
+
+puts "🌱 Seeding database..."
+
+# Create demo user
+demo_user = User.find_or_create_by!(email: "demo@auditron.dev") do |user|
+  user.password = "password123"
+end
+puts "✓ Demo user: #{demo_user.email}"
+
+# Create API key for demo user (only if none exist)
+if demo_user.api_keys.empty?
+  api_key = demo_user.api_keys.create!(name: "Demo API Key", expires_at: 1.year.from_now)
+  puts "✓ API Key created: #{api_key.raw_token}"
+  puts ""
+  puts "=" * 60
+  puts "📋 SAVE THIS API KEY - It won't be shown again!"
+  puts "   Token: #{api_key.raw_token}"
+  puts "=" * 60
+else
+  puts "✓ API key already exists for demo user"
+end
+
+puts ""
+puts "🎉 Seeding complete!"
+
+# rubocop:enable Rails/Output
