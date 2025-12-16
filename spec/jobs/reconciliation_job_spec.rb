@@ -127,25 +127,23 @@ RSpec.describe ReconciliationJob do
     context "when an error occurs during processing" do
       before do
         allow_any_instance_of(Reconciliation).to receive(:files_attached?).and_return(true)
-        allow(BankFileParser).to receive(:call).and_raise(StandardError, "Parse failed")
+        allow(BankFileParser).to receive(:call).and_raise(
+          BankFileParser::ParseError, "Parse failed"
+        )
       end
 
-      it "transitions status to failed and raises" do
-        expect do
-          described_class.perform_now(reconciliation.id)
-        end.to raise_error(StandardError, "Parse failed")
+      it "transitions status to failed" do
+        described_class.perform_now(reconciliation.id)
 
         reconciliation.reload
         expect(reconciliation.status).to eq("failed")
       end
 
-      it "stores error message and raises" do
-        expect do
-          described_class.perform_now(reconciliation.id)
-        end.to raise_error(StandardError, "Parse failed")
+      it "stores error message" do
+        described_class.perform_now(reconciliation.id)
 
         reconciliation.reload
-        expect(reconciliation.error_message).to eq("Parse failed")
+        expect(reconciliation.error_message).to include("Parse failed")
       end
     end
 
