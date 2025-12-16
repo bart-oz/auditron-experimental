@@ -86,3 +86,4 @@ detectors:
   ControlParameter:
     exclude:
       - Api::V1::BaseController#render_error
+      - ErrorHandling#fail_with!  # Optional message override is intentional
