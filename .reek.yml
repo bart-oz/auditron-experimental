@@ -80,7 +80,7 @@ detectors:
       - ReconciliationJob#process_reconciliation
       - ReconciliationJob#save_reconciliation_results
       - ReconciliationJob#build_result_attributes
-      - ReconciliationJob#build_report
+      - ReportBuilder#build_discrepancy_details  # Maps discrepancy hash fields
       - Api::V1::BaseController#render_error
 
   ControlParameter:

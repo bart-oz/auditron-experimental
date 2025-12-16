@@ -50,38 +50,9 @@ class ReconciliationJob < ApplicationJob
       bank_only_count: result.bank_only.size,
       processor_only_count: result.processor_only.size,
       discrepancy_count: result.discrepancies.size,
-      report: build_report(result),
+      report: ReportBuilder.call(result),
       processed_at: Time.current
     }
-  end
-
-  def build_report(result)
-    {
-      summary: build_summary(result),
-      discrepancy_details: build_discrepancy_details(result.discrepancies),
-      bank_only_ids: result.bank_only.pluck(:id),
-      processor_only_ids: result.processor_only.pluck(:id)
-    }.to_json
-  end
-
-  def build_summary(result)
-    {
-      matched: result.matched.size,
-      bank_only: result.bank_only.size,
-      processor_only: result.processor_only.size,
-      discrepancies: result.discrepancies.size
-    }
-  end
-
-  def build_discrepancy_details(discrepancies)
-    discrepancies.map do |disc|
-      {
-        transaction_id: disc[:id],
-        bank_amount: disc[:bank_amount].to_f,
-        processor_amount: disc[:processor_amount].to_f,
-        difference: disc[:difference].to_f
-      }
-    end
   end
 
   def handle_failure(reconciliation, error)
