@@ -38,19 +38,31 @@ class TransactionMatcher
   def classify_transaction(bank_tx, processor_tx)
     return @results[:bank_only] << bank_tx unless processor_tx
 
-    if amounts_match?(bank_tx[:amount], processor_tx[:amount])
+    discrepancy = build_discrepancy(bank_tx, processor_tx)
+
+    if discrepancy[:types].empty?
       @results[:matched] << { bank: bank_tx, processor: processor_tx }
     else
-      @results[:discrepancies] << build_discrepancy(bank_tx, processor_tx)
+      @results[:discrepancies] << discrepancy
     end
   end
 
   def build_discrepancy(bank_tx, processor_tx)
+    bank_amount = bank_tx[:amount]
+    processor_amount = processor_tx[:amount]
+
+    types = []
+    types << :amount unless amounts_match?(bank_amount, processor_amount)
+    types << :status unless statuses_match?(bank_tx[:status], processor_tx[:status])
+
     {
       id: bank_tx[:id],
-      bank_amount: bank_tx[:amount],
-      processor_amount: processor_tx[:amount],
-      difference: (bank_tx[:amount] - processor_tx[:amount]).abs
+      types:,
+      bank_amount:,
+      processor_amount:,
+      amount_difference: (bank_amount - processor_amount).abs,
+      bank_status: bank_tx[:status],
+      processor_status: processor_tx[:status]
     }
   end
 
@@ -60,5 +72,9 @@ class TransactionMatcher
 
   def amounts_match?(bank_amount, processor_amount)
     (bank_amount - processor_amount).abs <= AMOUNT_TOLERANCE
+  end
+
+  def statuses_match?(bank_status, processor_status)
+    bank_status == processor_status
   end
 end

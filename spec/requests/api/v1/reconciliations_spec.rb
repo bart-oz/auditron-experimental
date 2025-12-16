@@ -141,20 +141,20 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
     end
   end
 
-  describe "POST /api/v1/reconciliations" do
+  describe "POST /api/v1/reconcile" do
     let(:valid_params) { { reconciliation: { status: "pending" } } }
 
     context "with valid authentication and params" do
       it "creates a new reconciliation" do
         expect do
-          post "/api/v1/reconciliations", params: valid_params, headers: auth_headers
+          post "/api/v1/reconcile", params: valid_params, headers: auth_headers
         end.to change(Reconciliation, :count).by(1)
 
         expect(response).to have_http_status(:created)
       end
 
       it "returns the created reconciliation" do
-        post "/api/v1/reconciliations", params: valid_params, headers: auth_headers
+        post "/api/v1/reconcile", params: valid_params, headers: auth_headers
 
         expect(response.parsed_body["success"]).to be true
         expect(json_data["reconciliation"]["status"]).to eq("pending")
@@ -162,7 +162,7 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
       end
 
       it "assigns the reconciliation to the current user" do
-        post "/api/v1/reconciliations", params: valid_params, headers: auth_headers
+        post "/api/v1/reconcile", params: valid_params, headers: auth_headers
 
         created = Reconciliation.find(json_data["reconciliation"]["id"])
         expect(created.user).to eq(user)
@@ -171,7 +171,7 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
 
     context "with invalid params" do
       it "returns 422 with validation errors" do
-        post "/api/v1/reconciliations", params: {}, headers: auth_headers
+        post "/api/v1/reconcile", params: {}, headers: auth_headers
 
         expect(response).to have_http_status(:bad_request)
       end
@@ -179,14 +179,14 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
 
     context "without authentication" do
       it "returns 401 Unauthorized" do
-        post "/api/v1/reconciliations", params: valid_params
+        post "/api/v1/reconcile", params: valid_params
 
         expect(response).to have_http_status(:unauthorized)
       end
 
       it "does not create a reconciliation" do
         expect do
-          post "/api/v1/reconciliations", params: valid_params
+          post "/api/v1/reconcile", params: valid_params
         end.not_to change(Reconciliation, :count)
       end
     end
@@ -206,7 +206,7 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         }
 
         expect do
-          post "/api/v1/reconciliations", params:, headers: auth_headers
+          post "/api/v1/reconcile", params:, headers: auth_headers
         end.to change(Reconciliation, :count).by(1)
 
         expect(response).to have_http_status(:created)
@@ -217,7 +217,7 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
       it "creates reconciliation with only bank_file" do
         params = { reconciliation: { status: "pending", bank_file: } }
 
-        post "/api/v1/reconciliations", params:, headers: auth_headers
+        post "/api/v1/reconcile", params:, headers: auth_headers
 
         expect(response).to have_http_status(:created)
         expect(json_data["reconciliation"]["bank_file_attached"]).to be true
@@ -227,12 +227,70 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
       it "rejects invalid file types" do
         params = { reconciliation: { status: "pending", bank_file: invalid_file } }
 
-        post "/api/v1/reconciliations", params:, headers: auth_headers
+        post "/api/v1/reconcile", params:, headers: auth_headers
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body["success"]).to be false
         expect(json_error["code"]).to eq("VALIDATION_ERROR")
         expect(json_error["details"]["errors"]).to include("Bank file must be a CSV file")
+      end
+    end
+  end
+
+  describe "GET /api/v1/reconciliations/:id/report" do
+    let(:reconciliation) { create(:reconciliation, :completed, user:) }
+
+    context "with valid authentication" do
+      it "returns a Markdown report for completed reconciliation" do
+        get "/api/v1/reconciliations/#{reconciliation.id}/report", headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to include("text/markdown")
+        expect(response.body).to include("# Reconciliation Report")
+      end
+
+      it "includes summary section in the report" do
+        get "/api/v1/reconciliations/#{reconciliation.id}/report", headers: auth_headers
+
+        expect(response.body).to include("## Summary")
+        expect(response.body).to include("Matched Transactions")
+        expect(response.body).to include("Discrepancies")
+      end
+
+      it "returns 404 for pending reconciliation" do
+        pending_reconciliation = create(:reconciliation, user:)
+
+        get "/api/v1/reconciliations/#{pending_reconciliation.id}/report", headers: auth_headers
+
+        expect(response).to have_http_status(:not_found)
+        expect(json_error["code"]).to eq("NOT_FOUND")
+        expect(json_error["message"]).to include("not available")
+      end
+
+      it "returns 404 for processing reconciliation" do
+        processing_reconciliation = create(:reconciliation, :processing, user:)
+
+        get "/api/v1/reconciliations/#{processing_reconciliation.id}/report", headers: auth_headers
+
+        expect(response).to have_http_status(:not_found)
+        expect(json_error["code"]).to eq("NOT_FOUND")
+      end
+
+      it "returns 404 for another user's reconciliation" do
+        other_user = create(:user)
+        other_reconciliation = create(:reconciliation, :completed, user: other_user)
+
+        get "/api/v1/reconciliations/#{other_reconciliation.id}/report", headers: auth_headers
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "without authentication" do
+      it "returns 401 Unauthorized" do
+        get "/api/v1/reconciliations/#{reconciliation.id}/report"
+
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

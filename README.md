@@ -23,8 +23,8 @@
 
 Auditron is a Rails API that reconciles payment transactions between **bank statements** (CSV) and **payment processor records** (JSON). It identifies:
 
-- ✅ **Matched transactions** — Same ID and amount in both sources
-- ⚠️ **Discrepancies** — Same ID but different amounts
+- ✅ **Matched transactions** — Same ID, amount, and status in both sources
+- ⚠️ **Discrepancies** — Same ID but different amounts or statuses
 - 🏦 **Bank-only** — Transactions only in bank file
 - 💳 **Processor-only** — Transactions only in processor file
 
@@ -102,9 +102,87 @@ reconciliations
 ├── user_id → users
 ├── status (pending → processing → completed/failed)
 ├── matched_count, bank_only_count, processor_only_count, discrepancy_count
-├── report (JSON)
+├── report (Markdown)
 ├── error_message
 └── processed_at
+```
+
+---
+
+## API Endpoints
+
+All endpoints require Bearer token authentication (except health check).
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/up` | Health check (no auth) |
+| `POST` | `/api/v1/reconcile` | Create reconciliation & upload files |
+| `GET` | `/api/v1/reconciliations` | List all reconciliations (paginated) |
+| `GET` | `/api/v1/reconciliations/:id` | Get reconciliation details |
+| `GET` | `/api/v1/reconciliations/:id/report` | Download Markdown report |
+
+### Authentication
+
+Include Bearer token in all API requests:
+```
+Authorization: Bearer <your-api-token>
+```
+
+### Response Format
+
+All responses follow a consistent JSON structure:
+
+**Success:**
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+**Error:**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable message"
+  }
+}
+```
+
+### Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `UNAUTHORIZED` | 401 | Missing or invalid API token |
+| `FORBIDDEN` | 403 | Not authorized to access resource |
+| `NOT_FOUND` | 404 | Resource not found |
+| `VALIDATION_ERROR` | 422 | Invalid request parameters |
+| `RATE_LIMITED` | 429 | Too many requests |
+
+### Pagination
+
+List endpoints support pagination via query parameters:
+
+| Parameter | Default | Max | Description |
+|-----------|---------|-----|-------------|
+| `page` | 1 | - | Page number |
+| `limit` | 25 | 100 | Items per page |
+
+Response includes pagination metadata:
+```json
+{
+  "data": {
+    "reconciliations": [...],
+    "pagination": {
+      "count": 50,
+      "page": 1,
+      "limit": 25,
+      "pages": 2
+    }
+  }
+}
 ```
 
 ---
@@ -152,7 +230,7 @@ Authorization: Bearer <your-api-token>
 ### 2. Create Reconciliation
 
 ```http
-POST http://localhost:3000/api/v1/reconciliations
+POST http://localhost:3000/api/v1/reconcile
 Content-Type: multipart/form-data
 
 reconciliation[bank_file]: <upload bank.csv>
@@ -165,7 +243,15 @@ reconciliation[processor_file]: <upload processor.json>
 GET http://localhost:3000/api/v1/reconciliations/:id
 ```
 
-### 4. List All
+### 4. Download Report (Markdown)
+
+```http
+GET http://localhost:3000/api/v1/reconciliations/:id/report
+```
+
+Returns `text/markdown` with a formatted reconciliation report.
+
+### 5. List All
 
 ```http
 GET http://localhost:3000/api/v1/reconciliations?page=1&limit=25

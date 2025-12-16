@@ -74,26 +74,21 @@ RSpec.describe ReconciliationJob do
         expect(reconciliation.discrepancy_count).to eq(1) # TX003 amount mismatch
       end
 
-      it "generates a report" do
+      it "generates a Markdown report" do
         described_class.perform_now(reconciliation.id)
         reconciliation.reload
 
         expect(reconciliation.report).to be_present
-        report = JSON.parse(reconciliation.report)
-
-        expect(report).to include("summary", "discrepancy_details", "bank_only_ids", "processor_only_ids")
+        expect(reconciliation.report).to include("# Payment Reconciliation Report")
+        expect(reconciliation.report).to include("## Summary")
       end
 
       it "stores discrepancy details in report" do
         described_class.perform_now(reconciliation.id)
         reconciliation.reload
 
-        report = JSON.parse(reconciliation.report)
-        discrepancy = report["discrepancy_details"].first
-
-        expect(discrepancy["transaction_id"]).to eq("TX003")
-        expect(discrepancy["bank_amount"]).to eq(75.25)
-        expect(discrepancy["processor_amount"]).to eq(75.0)
+        expect(reconciliation.report).to include("TX003")
+        expect(reconciliation.report).to include("$75.25 vs $75.0")
       end
 
       it "sets processed_at timestamp" do

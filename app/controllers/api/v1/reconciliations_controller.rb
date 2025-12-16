@@ -7,7 +7,7 @@ module Api
       include Pagy::Method
 
       before_action :authenticate_api_key!
-      before_action :set_reconciliation, only: [:show]
+      before_action :set_reconciliation, only: %i[show report]
 
       # Rescue Pundit errors with proper error codes
       rescue_from Pundit::NotAuthorizedError do
@@ -31,7 +31,18 @@ module Api
         render_success({ reconciliation: ReconciliationSerializer.call(@reconciliation) })
       end
 
-      # POST /api/v1/reconciliations
+      # GET /api/v1/reconciliations/:id/report
+      def report
+        authorize @reconciliation, :show?
+
+        if @reconciliation.completed? && @reconciliation.report.present?
+          render plain: @reconciliation.report, content_type: "text/markdown"
+        else
+          render_error(ErrorCodes::NOT_FOUND, message: "Report not available yet")
+        end
+      end
+
+      # POST /api/v1/reconcile
       def create
         reconciliation = current_user.reconciliations.build(reconciliation_params)
         authorize reconciliation

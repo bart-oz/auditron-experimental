@@ -50,6 +50,7 @@ RSpec.describe TransactionMatcher do
         expect(result.discrepancies.size).to eq(1)
         discrepancy = result.discrepancies.first
         expect(discrepancy[:id]).to eq("TX001")
+        expect(discrepancy[:types]).to eq([:amount])
         expect(discrepancy[:bank_amount]).to eq(BigDecimal("100.50"))
         expect(discrepancy[:processor_amount]).to eq(BigDecimal("100.00"))
       end
@@ -58,6 +59,45 @@ RSpec.describe TransactionMatcher do
         result = described_class.call(bank_transactions:, processor_transactions:)
 
         expect(result.matched).to be_empty
+      end
+    end
+
+    context "with status discrepancies" do
+      let(:bank_transactions) do
+        [{ id: "TX001", amount: BigDecimal("100.00"), date: Date.new(2023, 4, 1), description: "Payment", status: "completed" }]
+      end
+
+      let(:processor_transactions) do
+        [{ id: "TX001", amount: BigDecimal("100.00"), date: Date.new(2023, 4, 1), description: "Payment", status: "pending" }]
+      end
+
+      it "identifies status discrepancies" do
+        result = described_class.call(bank_transactions:, processor_transactions:)
+
+        expect(result.discrepancies.size).to eq(1)
+        discrepancy = result.discrepancies.first
+        expect(discrepancy[:id]).to eq("TX001")
+        expect(discrepancy[:types]).to eq([:status])
+        expect(discrepancy[:bank_status]).to eq("completed")
+        expect(discrepancy[:processor_status]).to eq("pending")
+      end
+    end
+
+    context "with both amount and status discrepancies" do
+      let(:bank_transactions) do
+        [{ id: "TX001", amount: BigDecimal("100.50"), date: Date.new(2023, 4, 1), description: "Payment", status: "completed" }]
+      end
+
+      let(:processor_transactions) do
+        [{ id: "TX001", amount: BigDecimal("100.00"), date: Date.new(2023, 4, 1), description: "Payment", status: "pending" }]
+      end
+
+      it "identifies both discrepancy types" do
+        result = described_class.call(bank_transactions:, processor_transactions:)
+
+        expect(result.discrepancies.size).to eq(1)
+        discrepancy = result.discrepancies.first
+        expect(discrepancy[:types]).to contain_exactly(:amount, :status)
       end
     end
 

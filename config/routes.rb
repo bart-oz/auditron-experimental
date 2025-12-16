@@ -5,7 +5,12 @@ Rails.application.routes.draw do
   # API v1 routes
   namespace :api do
     namespace :v1 do
-      resources :reconciliations, only: [:index, :show, :create]
+      post "reconcile", to: "reconciliations#create"
+      resources :reconciliations, only: [:index, :show] do
+        member do
+          get :report
+        end
+      end
     end
   end
 end

@@ -152,9 +152,9 @@
 					]
 				},
 				"url": {
-					"raw": "{{base_url}}/api/v1/reconciliations",
+					"raw": "{{base_url}}/api/v1/reconcile",
 					"host": ["{{base_url}}"],
-					"path": ["api", "v1", "reconciliations"]
+					"path": ["api", "v1", "reconcile"]
 				},
 				"description": "Create a new reconciliation with bank and processor files.\n\n**Bank File (CSV):**\n```\ntransaction_id,date,amount,description,status,account_number\nTX001,01/04/2023,100.00,Payment One,completed,1234567890\n```\n\n**Processor File (JSON):**\n```json\n{\n  \"transactions\": [\n    {\"id\": \"TX001\", \"timestamp\": \"2023-04-01T09:15:32Z\", \"amount_cents\": 10000, \"merchant\": \"Payment One\", \"status\": \"successful\"}\n  ]\n}\n```"
 			},
@@ -196,6 +196,45 @@
 					"path": ["api", "v1", "reconciliations", "{{reconciliation_id}}"]
 				},
 				"description": "Get details of a specific reconciliation.\n\nAfter processing completes, the response includes:\n- `matched_count` - Transactions found in both files\n- `bank_only_count` - Transactions only in bank file\n- `processor_only_count` - Transactions only in processor file\n- `discrepancy_count` - Same ID but different amounts"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Reconciliation Report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response is Markdown', function () {",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/markdown');",
+							"});",
+							"",
+							"pm.test('Report contains header', function () {",
+							"    pm.expect(pm.response.text()).to.include('# Reconciliation Report');",
+							"});",
+							"",
+							"pm.test('Report contains summary section', function () {",
+							"    pm.expect(pm.response.text()).to.include('## Summary');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/reconciliations/{{reconciliation_id}}/report",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "reconciliations", "{{reconciliation_id}}", "report"]
+				},
+				"description": "Get the Markdown reconciliation report for a completed reconciliation.\n\nReturns `text/markdown` content type with a formatted report including:\n- Summary table with counts\n- Discrepancies table (if any)\n- Bank-only transactions (if any)\n- Processor-only transactions (if any)\n\n**Note:** Returns 404 if reconciliation is not yet completed."
 			},
 			"response": []
 		},

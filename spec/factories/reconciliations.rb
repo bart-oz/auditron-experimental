@@ -16,7 +16,22 @@ FactoryBot.define do
       processor_only_count { 3 }
       discrepancy_count { 2 }
       processed_at { Time.current }
-      report { { summary: "Reconciliation complete" }.to_json }
+      report do
+        <<~MARKDOWN
+          # Reconciliation Report
+
+          Generated: #{Time.current.strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+          ## Summary
+
+          | Metric | Count |
+          |--------|-------|
+          | ✅ Matched Transactions | 100 |
+          | ⚠️ Discrepancies | 2 |
+          | 🏦 Bank-only | 5 |
+          | 💳 Processor-only | 3 |
+        MARKDOWN
+      end
     end
 
     trait :failed do

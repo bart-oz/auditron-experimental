@@ -86,6 +86,7 @@ detectors:
       - ReconciliationJob#build_result_attributes
       - ReportBuilder#build_discrepancy_details  # Maps discrepancy hash fields
       - Api::V1::BaseController#render_error
+      - TransactionMatcher#build_discrepancy  # Builds discrepancy hashes
 
   ControlParameter:
     exclude:
