@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ReconciliationSerializer do
+RSpec.describe Api::V1::ReconciliationSerializer do
   describe ".call" do
     subject(:result) { described_class.call(reconciliation) }
 
