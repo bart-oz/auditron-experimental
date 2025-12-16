@@ -8,17 +8,22 @@ module Api
       before_action :authenticate_api_key!
       before_action :set_reconciliation, only: [:show]
 
+      # Rescue Pundit errors with proper error codes
+      rescue_from Pundit::NotAuthorizedError do
+        render_error(ErrorCodes::FORBIDDEN)
+      end
+
       # GET /api/v1/reconciliations
       def index
         authorize Reconciliation
         reconciliations = policy_scope(Reconciliation).recent
-        render json: { reconciliations: reconciliations.map { |r| serialize_reconciliation(r) } }
+        render_success({ reconciliations: reconciliations.map { |r| serialize_reconciliation(r) } })
       end
 
       # GET /api/v1/reconciliations/:id
       def show
         authorize @reconciliation
-        render json: { reconciliation: serialize_reconciliation(@reconciliation) }
+        render_success({ reconciliation: serialize_reconciliation(@reconciliation) })
       end
 
       # POST /api/v1/reconciliations
@@ -30,9 +35,13 @@ module Api
           # Enqueue processing job if both files are attached
           ReconciliationJob.perform_later(reconciliation.id) if reconciliation.files_attached?
 
-          render json: { reconciliation: serialize_reconciliation(reconciliation) }, status: :created
+          render_success({ reconciliation: serialize_reconciliation(reconciliation) }, status: :created)
         else
-          render json: { errors: reconciliation.errors.full_messages }, status: :unprocessable_content
+          render_error(
+            ErrorCodes::VALIDATION_ERROR,
+            message: "Validation failed",
+            details: { errors: reconciliation.errors.full_messages }
+          )
         end
       end
 
@@ -40,7 +49,7 @@ module Api
 
       def set_reconciliation
         @reconciliation = current_user.reconciliations.find_by(id: params[:id])
-        render json: { error: "Not found" }, status: :not_found unless @reconciliation
+        render_error(ErrorCodes::NOT_FOUND) unless @reconciliation
       end
 
       def reconciliation_params

@@ -7,6 +7,14 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
   let(:api_key) { create(:api_key, user:) }
   let(:auth_headers) { { "Authorization" => "Bearer #{api_key.raw_token}" } }
 
+  def json_data
+    response.parsed_body["data"]
+  end
+
+  def json_error
+    response.parsed_body["error"]
+  end
+
   describe "GET /api/v1/reconciliations" do
     context "with valid authentication" do
       let!(:older_reconciliation) { create(:reconciliation, user:) }
@@ -17,15 +25,14 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         get "/api/v1/reconciliations", headers: auth_headers
 
         expect(response).to have_http_status(:ok)
-        json = response.parsed_body
-        expect(json["reconciliations"].length).to eq(2)
+        expect(response.parsed_body["success"]).to be true
+        expect(json_data["reconciliations"].length).to eq(2)
       end
 
       it "does not return reconciliations from other users" do
         get "/api/v1/reconciliations", headers: auth_headers
 
-        json = response.parsed_body
-        ids = json["reconciliations"].pluck("id")
+        ids = json_data["reconciliations"].pluck("id")
         expect(ids).to include(older_reconciliation.id, newer_reconciliation.id)
         expect(ids).not_to include(other_user_reconciliation.id)
       end
@@ -33,8 +40,7 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
       it "returns reconciliations ordered by most recent first" do
         get "/api/v1/reconciliations", headers: auth_headers
 
-        json = response.parsed_body
-        expect(json["reconciliations"].first["id"]).to eq(newer_reconciliation.id)
+        expect(json_data["reconciliations"].first["id"]).to eq(newer_reconciliation.id)
       end
     end
 
@@ -43,7 +49,8 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         get "/api/v1/reconciliations"
 
         expect(response).to have_http_status(:unauthorized)
-        expect(response.parsed_body).to eq({ "error" => "Unauthorized" })
+        expect(response.parsed_body["success"]).to be false
+        expect(json_error["code"]).to eq("UNAUTHORIZED")
       end
     end
 
@@ -64,16 +71,16 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         get "/api/v1/reconciliations/#{reconciliation.id}", headers: auth_headers
 
         expect(response).to have_http_status(:ok)
-        json = response.parsed_body
-        expect(json["reconciliation"]["id"]).to eq(reconciliation.id)
-        expect(json["reconciliation"]["status"]).to eq("completed")
+        expect(response.parsed_body["success"]).to be true
+        expect(json_data["reconciliation"]["id"]).to eq(reconciliation.id)
+        expect(json_data["reconciliation"]["status"]).to eq("completed")
       end
 
       it "returns all serialized fields" do
         get "/api/v1/reconciliations/#{reconciliation.id}", headers: auth_headers
 
-        json = response.parsed_body["reconciliation"]
-        expect(json).to include(
+        reconciliation_data = json_data["reconciliation"]
+        expect(reconciliation_data).to include(
           "id", "status", "matched_count", "bank_only_count",
           "processor_only_count", "discrepancy_count", "error_message",
           "processed_at", "created_at", "updated_at"
@@ -89,7 +96,8 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         get "/api/v1/reconciliations/#{other_reconciliation.id}", headers: auth_headers
 
         expect(response).to have_http_status(:not_found)
-        expect(response.parsed_body).to eq({ "error" => "Not found" })
+        expect(response.parsed_body["success"]).to be false
+        expect(json_error["code"]).to eq("NOT_FOUND")
       end
     end
 
@@ -125,16 +133,15 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
       it "returns the created reconciliation" do
         post "/api/v1/reconciliations", params: valid_params, headers: auth_headers
 
-        json = response.parsed_body
-        expect(json["reconciliation"]["status"]).to eq("pending")
-        expect(json["reconciliation"]["id"]).to be_present
+        expect(response.parsed_body["success"]).to be true
+        expect(json_data["reconciliation"]["status"]).to eq("pending")
+        expect(json_data["reconciliation"]["id"]).to be_present
       end
 
       it "assigns the reconciliation to the current user" do
         post "/api/v1/reconciliations", params: valid_params, headers: auth_headers
 
-        json = response.parsed_body
-        created = Reconciliation.find(json["reconciliation"]["id"])
+        created = Reconciliation.find(json_data["reconciliation"]["id"])
         expect(created.user).to eq(user)
       end
     end
@@ -180,9 +187,8 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         end.to change(Reconciliation, :count).by(1)
 
         expect(response).to have_http_status(:created)
-        json = response.parsed_body
-        expect(json["reconciliation"]["bank_file_attached"]).to be true
-        expect(json["reconciliation"]["processor_file_attached"]).to be true
+        expect(json_data["reconciliation"]["bank_file_attached"]).to be true
+        expect(json_data["reconciliation"]["processor_file_attached"]).to be true
       end
 
       it "creates reconciliation with only bank_file" do
@@ -191,9 +197,8 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         post "/api/v1/reconciliations", params:, headers: auth_headers
 
         expect(response).to have_http_status(:created)
-        json = response.parsed_body
-        expect(json["reconciliation"]["bank_file_attached"]).to be true
-        expect(json["reconciliation"]["processor_file_attached"]).to be false
+        expect(json_data["reconciliation"]["bank_file_attached"]).to be true
+        expect(json_data["reconciliation"]["processor_file_attached"]).to be false
       end
 
       it "rejects invalid file types" do
@@ -202,8 +207,9 @@ RSpec.describe "Api::V1::Reconciliations", type: :request do
         post "/api/v1/reconciliations", params:, headers: auth_headers
 
         expect(response).to have_http_status(:unprocessable_content)
-        json = response.parsed_body
-        expect(json["errors"]).to include("Bank file must be a CSV file")
+        expect(response.parsed_body["success"]).to be false
+        expect(json_error["code"]).to eq("VALIDATION_ERROR")
+        expect(json_error["details"]["errors"]).to include("Bank file must be a CSV file")
       end
     end
   end
