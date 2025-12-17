@@ -27,6 +27,7 @@ gem "tzinfo-data", "1.2024.2", platforms: %i[windows jruby]
 
 group :development, :test do
   gem "brakeman", "7.1.1", require: false
+  gem "bullet", "~> 8.1"
   gem "bundler-audit", "0.9.3", require: false
   gem "debug", "1.11.0"
   gem "factory_bot_rails", "6.5.1"

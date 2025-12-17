@@ -17,7 +17,8 @@ module Api
       # GET /api/v1/reconciliations
       def index
         authorize Reconciliation
-        @pagy, reconciliations = pagy(:offset, policy_scope(Reconciliation).recent)
+        @pagy, reconciliations = pagy(:offset, policy_scope(Reconciliation)
+        .includes(:bank_file_attachment, :processor_file_attachment).recent)
 
         render_success({
                          reconciliations: reconciliations.map { |r| ReconciliationSerializer.call(r) },
