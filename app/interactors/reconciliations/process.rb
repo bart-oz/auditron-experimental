@@ -10,5 +10,16 @@ module Reconciliations
              MatchTransactions,
              BuildReport,
              CompleteReconciliation
+
+    def call
+      ActiveRecord::Base.transaction do
+        super
+      end
+    rescue StandardError => e
+      context.reconciliation.update(
+        status: :failed,
+        error_message: e.message
+      )
+    end
   end
 end

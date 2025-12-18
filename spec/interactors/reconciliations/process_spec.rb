@@ -33,6 +33,23 @@ RSpec.describe Reconciliations::Process do
       allow(TransactionMatcher).to receive(:call).and_return(match_result)
     end
 
+    it "sets status to failed and captures error message when an interactor fails" do
+      allow(ProcessorFileParser).to receive(:call).and_raise(StandardError, "Processor file is corrupted")
+
+      described_class.call(reconciliation:)
+
+      expect(reconciliation.reload.status).to eq("failed")
+      expect(reconciliation.reload.error_message).to include("Processor file is corrupted")
+    end
+
+    it "rolls back database changes when transaction fails" do
+      allow(TransactionMatcher).to receive(:call).and_raise(StandardError, "Matching error")
+
+      described_class.call(reconciliation:)
+
+      expect(reconciliation.reload.status).to eq("failed")
+    end
+
     it "processes reconciliation through all steps" do
       result = described_class.call(reconciliation:)
 
