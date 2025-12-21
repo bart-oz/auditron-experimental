@@ -21,7 +21,7 @@ module Auditron
     config.autoload_lib(ignore: %w[assets tasks])
     config.api_only = true
     config.engines_loading_behavior = :add if !Rails.env.test? # Skip litestream engine loading in test environment to avoid protect_from_forgery conflicts
-    config.active_record.schema_format = :sql # Use SQL format for schema dump (SQLite + UUIDs workaround)
+    config.active_record.schema_format = :ruby
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
     end
