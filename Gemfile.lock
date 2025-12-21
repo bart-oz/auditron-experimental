@@ -441,6 +441,10 @@ GEM
     sqlite3 (2.8.1-x86_64-darwin)
     sqlite3 (2.8.1-x86_64-linux-gnu)
     sqlite3 (2.8.1-x86_64-linux-musl)
+    sqlite_crypto (1.0.2)
+      rails (>= 7.1.0)
+      sqlite3 (>= 1.6.0)
+      ulid (~> 1.0)
     sshkit (1.25.0)
       base64
       logger
@@ -459,6 +463,7 @@ GEM
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    ulid (1.4.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
@@ -521,6 +526,7 @@ DEPENDENCIES
   solid_cache (= 1.0.10)
   solid_queue (= 1.2.4)
   sqlite3 (= 2.8.1)
+  sqlite_crypto (~> 1.0, >= 1.0.2)
   thruster (= 0.1.16)
   tzinfo-data (= 1.2024.2)
 
