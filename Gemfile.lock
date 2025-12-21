@@ -454,11 +454,11 @@ GEM
       ostruct
     stringio (3.1.9)
     thor (1.4.0)
-    thruster (0.1.16)
-    thruster (0.1.16-aarch64-linux)
-    thruster (0.1.16-arm64-darwin)
-    thruster (0.1.16-x86_64-darwin)
-    thruster (0.1.16-x86_64-linux)
+    thruster (0.1.17)
+    thruster (0.1.17-aarch64-linux)
+    thruster (0.1.17-arm64-darwin)
+    thruster (0.1.17-x86_64-darwin)
+    thruster (0.1.17-x86_64-linux)
     timeout (0.5.0)
     tsort (0.2.0)
     tzinfo (2.0.6)
@@ -527,7 +527,7 @@ DEPENDENCIES
   solid_queue (= 1.2.4)
   sqlite3 (= 2.8.1)
   sqlite_crypto (~> 1.0, >= 1.0.2)
-  thruster (= 0.1.16)
+  thruster (= 0.1.17)
   tzinfo-data (= 1.2024.2)
 
 RUBY VERSION

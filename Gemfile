@@ -23,7 +23,7 @@ gem "solid_cache", "1.0.10"
 gem "solid_queue", "1.2.4"
 gem "sqlite3", "2.8.1"
 gem "sqlite_crypto", "~> 1.0", ">= 1.0.2"
-gem "thruster", "0.1.16", require: false
+gem "thruster", "0.1.17", require: false
 gem "tzinfo-data", "1.2024.2", platforms: %i[windows jruby]
 
 group :development, :test do
