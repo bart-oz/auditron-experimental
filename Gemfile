@@ -36,7 +36,7 @@ group :development, :test do
   gem "reek", "6.5.0", require: false
   gem "rspec-rails", github: "rspec/rspec-rails", branch: "main"
   gem "rswag-specs", "2.17"
-  gem "rubocop", "1.81.7", require: false
+  gem "rubocop", "1.82.0", require: false
   gem "rubocop-performance", "1.26.1", require: false
   gem "rubocop-rails", "2.34.2", require: false
   gem "rubocop-rspec", "3.8.0", require: false
