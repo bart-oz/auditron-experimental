@@ -184,7 +184,7 @@ GEM
     json-schema (6.0.0)
       addressable (~> 2.8)
       bigdecimal (~> 3.1)
-    kamal (2.9.0)
+    kamal (2.10.1)
       activesupport (>= 7.0)
       base64 (~> 0.2)
       bcrypt_pbkdf (~> 1.0)
@@ -244,7 +244,8 @@ GEM
       net-smtp
     marcel (1.1.0)
     mini_mime (1.1.5)
-    minitest (5.27.0)
+    minitest (6.0.0)
+      prism (~> 1.5)
     msgpack (1.8.0)
     net-imap (0.5.12)
       date
@@ -475,7 +476,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yaml (0.4.0)
-    zeitwerk (2.7.3)
+    zeitwerk (2.7.4)
 
 PLATFORMS
   aarch64-linux
@@ -501,7 +502,7 @@ DEPENDENCIES
   factory_bot_rails (= 6.5.1)
   faker (= 3.5.3)
   interactor (= 3.2)
-  kamal (= 2.9.0)
+  kamal (= 2.10.1)
   litestream (= 0.14.0)
   pagy (= 43.2.1)
   puma (= 7.1.0)

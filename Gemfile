@@ -8,7 +8,7 @@ gem "bcrypt", "3.1.20"
 gem "bootsnap", "1.19", require: false
 gem "csv", "3.3.5"
 gem "interactor", "3.2"
-gem "kamal", "2.9.0", require: false
+gem "kamal", "2.10.1", require: false
 gem "litestream", "0.14.0", require: false, platforms: :ruby
 gem "pagy", "43.2.1"
 gem "puma", "7.1.0"
