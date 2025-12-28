@@ -5,7 +5,7 @@ source "https://rubygems.org"
 ruby "3.4.7"
 
 gem "bcrypt", "3.1.20"
-gem "bootsnap", "1.19", require: false
+gem "bootsnap", "1.20.1", require: false
 gem "csv", "3.3.5"
 gem "interactor", "3.2"
 gem "kamal", "2.9.0", require: false
