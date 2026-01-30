@@ -57,6 +57,9 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   config.include FactoryBot::Syntax::Methods
   config.include ActiveSupport::Testing::TimeHelpers
+  config.before do
+    ActiveJob::Base.queue_adapter = :test
+  end
 end
 
 Shoulda::Matchers.configure do |config|
