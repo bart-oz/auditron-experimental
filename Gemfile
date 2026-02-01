@@ -11,7 +11,7 @@ gem "interactor", "3.2"
 gem "kamal", "2.10.1", require: false
 gem "litestream", "0.14.0", require: false, platforms: :ruby
 gem "pagy", "43.2.2"
-gem "puma", "7.1.0"
+gem "puma", "7.2.0"
 gem "pundit", "2.5.2"
 gem "rack-attack", "6.8.0"
 gem "rack-cors", "3.0.0"
