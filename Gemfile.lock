@@ -247,7 +247,7 @@ GEM
     minitest (6.0.1)
       prism (~> 1.5)
     msgpack (1.8.0)
-    net-imap (0.5.12)
+    net-imap (0.6.2)
       date
       net-protocol
     net-pop (0.1.2)
@@ -289,7 +289,7 @@ GEM
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.6.0)
+    prism (1.9.0)
     psych (5.3.1)
       date
       stringio
@@ -442,7 +442,7 @@ GEM
     sqlite3 (2.9.0-x86_64-darwin)
     sqlite3 (2.9.0-x86_64-linux-gnu)
     sqlite3 (2.9.0-x86_64-linux-musl)
-    sqlite_crypto (1.0.3)
+    sqlite_crypto (2.0.1)
       rails (>= 7.1.0)
       sqlite3 (>= 1.6.0)
       ulid (~> 1.0)
@@ -460,7 +460,7 @@ GEM
     thruster (0.1.17-arm64-darwin)
     thruster (0.1.17-x86_64-darwin)
     thruster (0.1.17-x86_64-linux)
-    timeout (0.5.0)
+    timeout (0.6.0)
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -527,7 +527,7 @@ DEPENDENCIES
   solid_cache (= 1.0.10)
   solid_queue (= 1.2.4)
   sqlite3 (= 2.9.0)
-  sqlite_crypto (~> 1.0, >= 1.0.3)
+  sqlite_crypto (~> 2.0)
   thruster (= 0.1.17)
   tzinfo-data (= 1.2024.2)
 
