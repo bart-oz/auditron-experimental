@@ -20,7 +20,7 @@ gem "rswag-api", "2.17.0"
 gem "rswag-ui", "2.17.0"
 gem "solid_cable", "3.0.12"
 gem "solid_cache", "1.0.10"
-gem "solid_queue", "1.2.4"
+gem "solid_queue", "1.3.1"
 gem "sqlite3", "2.9.0"
 gem "sqlite_crypto", "~> 1.0", ">= 1.0.3"
 gem "thruster", "0.1.17", require: false
