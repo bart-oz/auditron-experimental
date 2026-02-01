@@ -38,7 +38,7 @@ group :development, :test do
   gem "rswag-specs", "2.17"
   gem "rubocop", "1.82.1", require: false
   gem "rubocop-performance", "1.26.1", require: false
-  gem "rubocop-rails", "2.34.2", require: false
+  gem "rubocop-rails", "2.34.3", require: false
   gem "rubocop-rspec", "3.8.0", require: false
 end
 

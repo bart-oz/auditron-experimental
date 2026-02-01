@@ -283,13 +283,13 @@ GEM
       json
       yaml
     parallel (1.27.0)
-    parser (3.3.10.0)
+    parser (3.3.10.1)
       ast (~> 2.4.1)
       racc
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.6.0)
+    prism (1.9.0)
     psych (5.3.1)
       date
       stringio
@@ -392,14 +392,14 @@ GEM
       rubocop-ast (>= 1.48.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.48.0)
+    rubocop-ast (1.49.0)
       parser (>= 3.3.7.2)
-      prism (~> 1.4)
+      prism (~> 1.7)
     rubocop-performance (1.26.1)
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
-    rubocop-rails (2.34.2)
+    rubocop-rails (2.34.3)
       activesupport (>= 4.2.0)
       lint_roller (~> 1.1)
       rack (>= 1.1)
@@ -518,7 +518,7 @@ DEPENDENCIES
   rswag-ui (= 2.17.0)
   rubocop (= 1.82.1)
   rubocop-performance (= 1.26.1)
-  rubocop-rails (= 2.34.2)
+  rubocop-rails (= 2.34.3)
   rubocop-rspec (= 3.8.0)
   shoulda-matchers (= 7.0.1)
   simplecov (= 0.22.0)
