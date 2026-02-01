@@ -32,7 +32,7 @@ group :development, :test do
   gem "bundler-audit", "0.9.3", require: false
   gem "debug", "1.11.1"
   gem "factory_bot_rails", "6.5.1"
-  gem "faker", "3.5.3"
+  gem "faker", "3.6.0"
   gem "reek", "6.5.0", require: false
   gem "rspec-rails", github: "rspec/rspec-rails", branch: "main"
   gem "rswag-specs", "2.17"
