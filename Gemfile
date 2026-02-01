@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 ruby "4.0.0"
 
-gem "bcrypt", "3.1.20"
+gem "bcrypt", "3.1.21"
 gem "bootsnap", "1.20.1", require: false
 gem "csv", "3.3.5"
 gem "interactor", "3.2"
